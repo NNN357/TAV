@@ -4,7 +4,7 @@
 AUTHOR_QQ="317032529"
 GROUP_QQ="616353694"
 CONTACT_EMAIL="future_404@outlook.com"
-PROJECT_URL="https://github.com/Future-404/TAV-X"
+PROJECT_URL="https://github.com/NNN357/TAV"
 SLOGAN="Don't let virtual warmth steal the real warmth you deserve in life."
 UPDATE_SUMMARY="v3.0 TMIS Architecture Refactoring Milestone:
   1. [Refactor] Core decentralization, implementing 'kernel+app' plugin architecture

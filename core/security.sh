@@ -72,7 +72,7 @@ clean_git_remotes() {
     ui_print info "Repairing..."
     
     local st_path=$(get_app_path "sillytavern")
-    reset_to_official_remote "$TAVX_DIR" "Future-404/TAV-X.git" && echo -e "  - TAV-X: OK"
+    reset_to_official_remote "$TAVX_DIR" "NNN357/TAV.git" && echo -e "  - TAV-X: OK"
     [ -d "$st_path" ] && reset_to_official_remote "$st_path" "SillyTavern/SillyTavern.git" && echo -e "  - SillyTavern: OK"
     
     ui_print success "Repair complete."; ui_pause

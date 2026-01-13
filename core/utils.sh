@@ -198,7 +198,7 @@ auto_load_proxy_env() {
 
 check_github_speed() {
     local THRESHOLD=819200
-    local TEST_URL="https://raw.githubusercontent.com/Future-404/TAV-X/main/core/env.sh"
+    local TEST_URL="https://raw.githubusercontent.com/NNN357/TAV/main/core/env.sh"
     echo -e "${CYAN}Testing GitHub direct connection speed (threshold: 800KB/s)...${NC}"
     
     local speed=$(curl -s -L -m 5 -w "%{speed_download}\n" -o /dev/null "$TEST_URL" 2>/dev/null)
@@ -268,7 +268,7 @@ select_mirror_interactive() {
         
         for mirror in "${mirrors[@]}"; do
             local start=$(date +%s%N)
-            local test_url="${mirror}https://github.com/Future-404/TAV-X/info/refs?service=git-upload-pack"
+            local test_url="${mirror}https://github.com/NNN357/TAV/info/refs?service=git-upload-pack"
             echo -n -e "  Testing: ${mirror} ... \r"
             if curl -fsL -A "Mozilla/5.0" -r 0-10 -o /dev/null -m 5 "$test_url" 2>/dev/null;
             then

@@ -11,7 +11,7 @@ export default {
       return new Response(html, { headers: { 'content-type': 'text/html;charset=UTF-8' } });
     }
     
-    const scriptUrl = "https://raw.githubusercontent.com/Future-404/TAV-X/main/st.sh?t=" + Date.now();
+    const scriptUrl = "https://raw.githubusercontent.com/NNN357/TAV/main/st.sh?t=" + Date.now();
     
     try {
       const ghRes = await fetch(scriptUrl, {

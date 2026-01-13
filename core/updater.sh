@@ -11,7 +11,7 @@ check_for_updates() {
     [ ! -d "$TAVX_DIR/.git" ] && return
     (
         cd "$TAVX_DIR" || exit
-        local check_url=$(get_dynamic_repo_url "Future-404/TAV-X.git")
+        local check_url=$(get_dynamic_repo_url "NNN357/TAV.git")
         local REMOTE_HASH=$(git ls-remote "$check_url" HEAD | awk '{print $1}')
         local LOCAL_HASH=$(git rev-parse HEAD)
         
@@ -34,7 +34,7 @@ perform_self_update() {
     if ! ui_confirm "Are you sure you want to update the script core now?"; then return; fi
 
     prepare_network_strategy
-    local TEMP_URL=$(get_dynamic_repo_url "Future-404/TAV-X.git")
+    local TEMP_URL=$(get_dynamic_repo_url "NNN357/TAV.git")
     local UPD_CMD="cd \"$TAVX_DIR\"; git fetch \"$TEMP_URL\" main; git reset --hard FETCH_HEAD"
     
     if ui_spinner "Syncing script core..." "$UPD_CMD"; then
@@ -45,7 +45,7 @@ perform_self_update() {
         chmod +x "$TAVX_DIR/modules/"**/*.sh 2>/dev/null
         chmod +x "$TAVX_DIR/bin/"* 2>/dev/null
         
-        reset_to_official_remote "$TAVX_DIR" "Future-404/TAV-X.git"
+        reset_to_official_remote "$TAVX_DIR" "NNN357/TAV.git"
         
         ui_print success "Script core updated! Restarting..."
         sleep 1

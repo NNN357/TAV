@@ -33,7 +33,7 @@ PROXY_PORTS=(
     "2080:http"
 )
 
-: "${REPO_PATH:=Future-404/TAV-X.git}"
+: "${REPO_PATH:=NNN357/TAV.git}"
 : "${TAV_VERSION:=Latest}"
 
 export TAVX_DIR="${HOME}/.tav_x"

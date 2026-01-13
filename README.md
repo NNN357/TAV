@@ -75,7 +75,7 @@ Please choose one of the following commands based on your network environment, c
 #### 🌏 Universal/International Line (Global)
 If you're outside mainland China, or your network environment allows GitHub access:
 ```bash
-curl -s -L https://raw.githubusercontent.com/Future-404/TAV-X/main/st.sh -o st.sh && chmod +x st.sh && ./st.sh; source ~/.bashrc
+curl -s -L https://raw.githubusercontent.com/NNN357/TAV/main/st.sh -o st.sh && chmod +x st.sh && ./st.sh; source ~/.bashrc
 ```
 
 #### 🚀 China Mainland Accelerated Lines
@@ -83,22 +83,22 @@ If you encounter network connection issues, please choose any of the following a
 
 **Line 1 (EdgeOne):**
 ```bash
-curl -s -L https://edgeone.gh-proxy.com/https://raw.githubusercontent.com/Future-404/TAV-X/main/st.sh -o st.sh && chmod +x st.sh && ./st.sh; source ~/.bashrc
+curl -s -L https://edgeone.gh-proxy.com/https://raw.githubusercontent.com/NNN357/TAV/main/st.sh -o st.sh && chmod +x st.sh && ./st.sh; source ~/.bashrc
 ```
 
 **Line 2 (HK):**
 ```bash
-curl -s -L https://hk.gh-proxy.com/https://raw.githubusercontent.com/Future-404/TAV-X/main/st.sh -o st.sh && chmod +x st.sh && ./st.sh; source ~/.bashrc
+curl -s -L https://hk.gh-proxy.com/https://raw.githubusercontent.com/NNN357/TAV/main/st.sh -o st.sh && chmod +x st.sh && ./st.sh; source ~/.bashrc
 ```
 
 **Line 3 (Generic):**
 ```bash
-curl -s -L https://gh-proxy.com/https://raw.githubusercontent.com/Future-404/TAV-X/main/st.sh -o st.sh && chmod +x st.sh && ./st.sh; source ~/.bashrc
+curl -s -L https://gh-proxy.com/https://raw.githubusercontent.com/NNN357/TAV/main/st.sh -o st.sh && chmod +x st.sh && ./st.sh; source ~/.bashrc
 ```
 
 **Line 4 (Likk):**
 ```bash
-curl -s -L https://gh.likk.cc/https://raw.githubusercontent.com/Future-404/TAV-X/main/st.sh -o st.sh && chmod +x st.sh && ./st.sh; source ~/.bashrc
+curl -s -L https://gh.likk.cc/https://raw.githubusercontent.com/NNN357/TAV/main/st.sh -o st.sh && chmod +x st.sh && ./st.sh; source ~/.bashrc
 ```
 
 ### ⚠️ Important: First Run Operation Guidelines

@@ -1,0 +1,27 @@
+# Name | RepoURL | ServerBranch | ClientBranch | DirName
+# -------------------------------------------------------
+Dialogue Text Colorizer | https://github.com/XanadusWorks/SillyTavern-Dialogue-Colorizer.git | - | HEAD | SillyTavern-Dialogue-Colorizer
+Top Info Bar | https://github.com/SillyTavern/Extension-TopInfoBar.git | - | HEAD | Extension-TopInfoBar
+UI Element Hider | https://github.com/uhhhh15/hide.git | - | HEAD | hide
+Custom Model List | https://github.com/LenAnderson/SillyTavern-CustomModels.git | - | HEAD | SillyTavern-CustomModels
+Chat Stats Panel | https://github.com/Junejulyz/chat-companion-stats.git | - | HEAD | chat-companion-stats
+Quick Reply | https://github.com/uhhhh15/QR.git | - | HEAD | QR
+Quick Response Force | https://github.com/AlbusKen/quick-response-force.git | - | HEAD | quick-response-force
+Input Helper | https://github.com/Mooooooon/st-input-helper.git | - | HEAD | st-input-helper
+Prompt Template Manager | https://github.com/zonde306/ST-Prompt-Template.git | - | HEAD | ST-Prompt-Template
+Message Favorites/Star | https://github.com/uhhhh15/star.git | - | HEAD | star
+Amily2 Chat Optimization | https://github.com/Wx-2025/ST-Amily2-Chat-Optimisation.git | - | HEAD | ST-Amily2-Chat-Optimisation
+Memory Enhancement | https://github.com/muyoou/st-memory-enhancement.git | HEAD | - | st-memory-enhancement
+Context Message Limit | https://github.com/SillyTavern/Extension-MessageLimit.git | - | HEAD | Extension-MessageLimit
+Frontend Tokenizer | https://github.com/GoldenglowMeow/ST-Frontend-Tokenizer.git | - | HEAD | ST-Frontend-Tokenizer
+Preset Manager Momo | https://github.com/1830488003/preset-manager-momo.git | - | HEAD | preset-manager-momo
+World Book Extension Momo | https://github.com/1830488003/my-world-book-momo.git | - | HEAD | my-world-book-momo
+Tavern Assistant | https://github.com/n0vi028/JS-Slash-Runner.git | - | HEAD | JS-Slash-Runner
+Bincooo JS Runner | https://github.com/bincooo/SillyTavernExtension-JsRunner.git | - | HEAD | SillyTavernExtension-JsRunner
+No Assistant Nonsense | https://gitgud.io/Monblant/noass.git | - | HEAD | noass
+Scheduled Reminder | https://github.com/Mooooooon/silly-tavern-reminder.git | - | HEAD | silly-tavern-reminder
+Generation Fail Notification | https://github.com/RealSubstantiality/fail-notification.git | - | HEAD | fail-notification
+Little White Box Toolbox | https://github.com/RT15548/LittleWhiteBox.git | - | HEAD | LittleWhiteBox
+Quick Persona Switch | https://github.com/SillyTavern/Extension-QuickPersona.git | - | HEAD | Extension-QuickPersona
+Chat History Backup | https://github.com/uhhhh15/chat-history-backup.git | - | HEAD | chat-history-backup
+Silence/Stop Generation | https://github.com/SillyTavern/Extension-Silence.git | - | HEAD | Extension-Silence

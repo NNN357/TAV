@@ -118,7 +118,7 @@ sillytavern_rollback() {
         case "$CHOICE" in
             *"Unlock"*) 
                 if ui_confirm "Confirm restore to latest Release version?"; then
-                    local CMD="git config remote.origin.fetch \"+refs/heads/*:refs/remotes/origin/*\"; git fetch \"$TEMP_URL\" release --depth=1; git reset --hard FETCH_HEAD; git checkout release"
+                    local CMD="git config remote.origin.fetch \"+refs/heads/*:refs/remotes/origin/*\"; git fetch \"$TEMP_URL\" release --depth=1; git checkout -B release FETCH_HEAD"
                     ui_stream_task "Rejoining..." "$CMD" && npm_install_smart "$ST_DIR"
                 fi ;;
             *"Historical"*) 
@@ -132,7 +132,7 @@ sillytavern_rollback() {
                 fi ;;
             *"Switch Channel"*) 
                 local TARGET="release"; [[ "$CHOICE" == *"Staging"* ]] && TARGET="staging"
-                local CMD="git config remote.origin.fetch \"+refs/heads/*:refs/remotes/origin/*\"; git fetch \"$TEMP_URL\" $TARGET --depth=1; git reset --hard FETCH_HEAD; git checkout $TARGET"
+                local CMD="git config remote.origin.fetch \"+refs/heads/*:refs/remotes/origin/*\"; git fetch \"$TEMP_URL\" $TARGET --depth=1; git checkout -B $TARGET FETCH_HEAD"
                 ui_stream_task "Switching to $TARGET..." "$CMD" && npm_install_smart "$ST_DIR" ;;
             *"Return"*) return ;;
         esac

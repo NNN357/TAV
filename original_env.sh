@@ -22,8 +22,17 @@ fi
 
 mkdir -p "$TMP_DIR"
 
-# Standardized runtime directory: prefer passed variable, otherwise default to ~/.tav_x
-export TAVX_DIR="${TAVX_DIR:-$HOME/.tav_x}"
+# 标准化运行目录：优先使用传入变量，其次尝试检测当前脚本位置，最后默认为 ~/.tav_x
+if [ -z "$TAVX_DIR" ]; then
+    CURRENT_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    # 假设 env.sh 位于 core/ 目录，上一级即为项目根目录
+    POSSIBLE_ROOT="$(dirname "$CURRENT_SCRIPT_DIR")"
+    if [ -f "$POSSIBLE_ROOT/core/main.sh" ]; then
+        export TAVX_DIR="$POSSIBLE_ROOT"
+    else
+        export TAVX_DIR="$HOME/.tav_x"
+    fi
+fi
 
 export TAVX_ROOT="$TAVX_DIR"
 export CONFIG_DIR="$TAVX_DIR/config"

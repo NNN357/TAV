@@ -185,86 +185,102 @@ setup_nodesource() {
     }
     export -f setup_nodesource
     
+    install_motd_hook() {
+        [ "$OS_TYPE" != "TERMUX" ] && return
+        
+        local hook_file="$PREFIX/etc/profile.d/tavx_status.sh"
+        [ -f "$hook_file" ] && return # Already installed, skip
+        
+        ui_print info "Configuring terminal startup notification..."
+        cat > "$hook_file" <<'EOF'
+#!/bin/sh
+# TAV-X Auto-status check
+if [ -d "$PREFIX/var/service" ] && command -v sv >/dev/null; then
+    _tx_srvs=""
+    for s in "$PREFIX/var/service"/*; do
+        if [ -f "$s/.tavx_managed" ] && sv status "$(basename "$s")" 2>/dev/null | grep -q "^run:"; then
+            _tx_srvs="$_tx_srvs $(basename "$s")"
+        fi
+    done
+    [ -n "$_tx_srvs" ] && echo -e "\033[1;36m✨ TAV-X background services running:$_tx_srvs\033[0m"
+fi
+EOF
+        chmod +x "$hook_file"
+    }
+    export -f install_motd_hook
+
     check_dependencies() {
-        if [ "$DEPS_CHECKED" == "true" ]; then return 0; fi
+        if [ "$DEPS_CHECKED" == "true" ]; then 
+            [ "$OS_TYPE" == "TERMUX" ] && install_motd_hook
+            return 0 
+        fi
     
         local MISSING_PKGS=""
-        
-        local HAS_NODE=false; check_node_version && HAS_NODE=true
-        local HAS_GIT=false; command -v git &> /dev/null && HAS_GIT=true
-        local HAS_YQ=false; command -v yq &> /dev/null && HAS_YQ=true
-        local HAS_GUM=false; command -v gum &> /dev/null && HAS_GUM=true
-        local HAS_TAR=false; command -v tar &> /dev/null && HAS_TAR=true
-        local HAS_LESS=false; command -v less &> /dev/null && HAS_LESS=true
-    
-        if $HAS_NODE && $HAS_GIT && $HAS_YQ && $HAS_GUM && $HAS_TAR && $HAS_LESS; then
-            export DEPS_CHECKED="true"
-            return 0
-        fi
-    
-        ui_header "Environment Initialization"
-        echo -e "${BLUE}[INFO]${NC} Checking full component suite ($OS_TYPE)..."
-    
-        if ! $HAS_LESS; then
-            echo -e "${YELLOW}[WARN]${NC} less not found (log pager)"
-            MISSING_PKGS="$MISSING_PKGS less"
-        fi
-        
-        if ! $HAS_YQ; then
-            echo -e "${YELLOW}[WARN]${NC} yq not found (YAML tool)"
-            install_yq
-            command -v yq &>/dev/null && HAS_YQ=true
-        fi
-    
-        if ! $HAS_NODE; then 
-            echo -e "${YELLOW}[WARN]${NC} Node.js not found or version too low (<v20)"
-            if [ "$OS_TYPE" == "TERMUX" ]; then 
-                MISSING_PKGS="$MISSING_PKGS nodejs"
-            else 
-                echo -e "${YELLOW}Linux environment detected, auto-configure NodeSource repository to install latest Node.js?${NC}"
-                if ui_confirm "This requires root privileges (sudo) and will modify system source list."; then
-                    setup_nodesource
-                    if check_node_version; then HAS_NODE=true; else MISSING_PKGS="$MISSING_PKGS nodejs"; fi
-                else
-                     echo -e "${RED}[ERROR]${NC} Skipping Node.js configuration. SillyTavern may not start."
-                     MISSING_PKGS="$MISSING_PKGS nodejs npm"
-                fi
+        local ALL_FOUND=true
+        local NEEDS_UI=false
+
+        for dep in "${CORE_DEPENDENCIES[@]}"; do
+            local cmd="${dep%%|*}"
+            if [ "$cmd" == "node" ]; then
+                if ! check_node_version; then NEEDS_UI=true; break; fi
+            elif ! command -v "$cmd" &> /dev/null; then
+                NEEDS_UI=true; break
             fi
+        done
+
+        if [ "$NEEDS_UI" == "true" ]; then
+            ui_header "Environment Initialization"
+            echo -e "${BLUE}[INFO]${NC} Checking full core component suite ($OS_TYPE)..."
         fi
-    
-        if ! $HAS_GIT; then 
-            echo -e "${YELLOW}[WARN]${NC} Git not found"
-            MISSING_PKGS="$MISSING_PKGS git"
-        fi
-        
-        if ! $HAS_TAR; then MISSING_PKGS="$MISSING_PKGS tar"; fi
-    
-        if [ "$OS_TYPE" == "TERMUX" ]; then
-            if ! $HAS_GUM; then MISSING_PKGS="$MISSING_PKGS gum"; fi
-        fi
+
+        for dep in "${CORE_DEPENDENCIES[@]}"; do
+            local cmd="${dep%%|*}"
+            local pkg_termux=$(echo "$dep" | cut -d'|' -f2)
+            local pkg_linux=$(echo "$dep" | cut -d'|' -f3)
+            
+            if [ "$cmd" == "node" ]; then
+                if ! check_node_version; then
+                    if [ "$OS_TYPE" == "TERMUX" ]; then MISSING_PKGS="$MISSING_PKGS $pkg_termux"
+                    else
+                        [ "$NEEDS_UI" == "false" ] && ui_header "Environment Initialization"
+                        echo -e "${YELLOW}Node.js version too low or not installed, configuring NodeSource...${NC}"
+                        setup_nodesource || ALL_FOUND=false
+                    fi
+                fi
+                continue
+            fi
+
+            if ! command -v "$cmd" &> /dev/null; then
+                if [ "$OS_TYPE" == "LINUX" ]; then
+                    if [ "$cmd" == "gum" ]; then install_gum_linux || ALL_FOUND=false; continue; fi
+                    if [ "$cmd" == "yq" ]; then install_yq || ALL_FOUND=false; continue; fi
+                fi
+
+                echo -e "${YELLOW}[WARN]${NC} Dependency not found: $cmd"
+                [ "$OS_TYPE" == "TERMUX" ] && MISSING_PKGS="$MISSING_PKGS $pkg_termux" || MISSING_PKGS="$MISSING_PKGS $pkg_linux"
+            fi
+        done
     
         if [ -n "$MISSING_PKGS" ]; then
             ui_print info "Repairing missing dependencies: $MISSING_PKGS"
-            sys_install_pkg "$MISSING_PKGS"
+            if ! sys_install_pkg "$MISSING_PKGS"; then
+                ALL_FOUND=false
+            fi
         fi
         
-        if [ "$OS_TYPE" == "LINUX" ]; then
-            if ! command -v gum &>/dev/null; then install_gum_linux; fi
-        fi
-        
-        if command -v node &> /dev/null && \
-           command -v git &> /dev/null && \
-           command -v yq &> /dev/null && \
-           command -v gum &> /dev/null && \
-           command -v less &> /dev/null; then
-            
-            echo -e "${GREEN}[DONE]${NC} Environment fully repaired!"
+        [ "$OS_TYPE" == "TERMUX" ] && install_motd_hook
+
+        if [ "$ALL_FOUND" == "true" ]; then
             export DEPS_CHECKED="true"
-            ui_pause
+            if [ "$NEEDS_UI" == "true" ]; then
+                ui_print success "Environment fully repaired!"
+                ui_pause
+            fi
+            return 0
         else
-            echo -e "${RED}[ERROR]${NC} Environment repair incomplete!"
-            echo -e "${YELLOW}Please try running install commands manually or check network.${NC}"
+            ui_print error "Environment repair incomplete, please check error messages."
             ui_pause
+            return 1
         fi
     }
     export -f check_dependencies

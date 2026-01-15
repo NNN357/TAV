@@ -6,12 +6,28 @@ GROUP_QQ="616353694"
 CONTACT_EMAIL="future_404@outlook.com"
 PROJECT_URL="https://github.com/NNN357/TAV"
 SLOGAN="Don't let virtual warmth steal the real warmth you deserve in life."
-UPDATE_SUMMARY="v3.0 TMIS Architecture Refactoring Milestone:
-  1. [Refactor] Core decentralization, implementing 'kernel+app' plugin architecture
-  2. [New] Unified App Center, supporting local scanning, remote fetching, tiered installation
-  3. [Optimize] Automated log black box system, supporting auto-dump on task failure and history archiving
-  4. [Standardize] Unified path standards across all modules (apps/, logs/, run/), fully compatible with legacy data
-  5. [Migration] All modules promoted: Tavern, ClewdR, Mihomo, GCLI, AutoGLM, Gemini"
+UPDATE_SUMMARY="v3.1.0 Architecture-Level Refactoring Upgrade:
+  1. [Refactor] Introduced termux-services (Runit) for daemon processes and crash recovery
+  2. [New] Core dependency manifest for instant environment initialization
+  3. [New] CLI shortcuts support (st ps, st re, st log, st stop)
+  4. [New] Boot auto-start management menu with one-click service toggle
+  5. [Optimize] Removed redundant log timestamps, adapted terminal MOTD startup notification"
+
+show_shortcuts_help() {
+    ui_header "Shortcut Commands Usage"
+    echo -e "${YELLOW}Quick operations without entering main menu - just type in terminal:${NC}"
+    echo ""
+    printf "  ${CYAN}%-15s${NC} %s\n" "st" "Enter interactive management panel"
+    printf "  ${CYAN}%-15s${NC} %s\n" "st ps" "View currently running services"
+    printf "  ${CYAN}%-15s${NC} %s\n" "st re" "Restart all running services"
+    printf "  ${CYAN}%-15s${NC} %s\n" "st stop" "Stop all services at once"
+    printf "  ${CYAN}%-15s${NC} %s\n" "st update" "Force enter script update mode"
+    printf "  ${CYAN}%-15s${NC} %s\n" "st log" "View available app IDs for logs"
+    printf "  ${CYAN}%-15s${NC} %s\n" "st log [ID]" "Monitor specified app logs in real-time"
+    echo ""
+    echo -e "${BLUE}💡 Tip:${NC} Press ${YELLOW}q${NC} to exit log monitoring."
+    ui_pause
+}
 
 show_about_page() {
     ui_header "Help & Support"
@@ -63,20 +79,26 @@ show_about_page() {
     local ACTION=""
     
     if [ "$HAS_GUM" = true ]; then
-        ACTION=$(gum choose "🔙 Return to Main Menu" "🔥 Join QQ Group" "🐙 GitHub Project Page")
+        ACTION=$(gum choose "🔙 Return to Main Menu" "⌨️ Shortcut Commands" "🔥 Join QQ Group" "🐙 GitHub Project Page")
     else
         echo "1. Return to Main Menu"
-        echo "2. Join QQ Group"
-        echo "3. Open GitHub Project Page"
+        echo "2. ⌨️  Shortcut Commands"
+        echo "3. Join QQ Group"
+        echo "4. Open GitHub Project Page"
         read -p "Please select: " idx
         case "$idx" in
-            "2") ACTION="Join QQ Group" ;;
-            "3") ACTION="GitHub" ;;
+            "2") ACTION="Shortcut Commands" ;;
+            "3") ACTION="Join QQ Group" ;;
+            "4") ACTION="GitHub" ;;
             *)   ACTION="Return" ;;
         esac
     fi
 
     case "$ACTION" in
+        *"Shortcut"*)
+            show_shortcuts_help
+            show_about_page
+            ;;
         *"QQ Group"*)
             ui_print info "Attempting to launch QQ..."
             local qq_scheme="mqqapi://card/show_pslcard?src_type=internal&version=1&uin=${GROUP_QQ}&card_type=group&source=qrcode"

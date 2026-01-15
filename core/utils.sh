@@ -734,9 +734,107 @@ get_app_path() {
 
 export -f download_file_smart
 export -f get_dynamic_repo_url
+
+
+tavx_service_register() {
+    local name="$1"
+    local run_cmd="$2"
+    local work_dir="$3"
+    
+    if [ "$OS_TYPE" == "TERMUX" ]; then
+        local sv_dir="$PREFIX/var/service/$name"
+        mkdir -p "$sv_dir/log"
+        
+        touch "$sv_dir/.tavx_managed"
+        
+        cat > "$sv_dir/run" <<EOF
+#!/data/data/com.termux/files/usr/bin/sh
+exec 2>&1
+cd $work_dir || exit 1
+exec $run_cmd
+EOF
+        chmod +x "$sv_dir/run"
+        
+        cat > "$sv_dir/log/run" <<EOF
+#!/data/data/com.termux/files/usr/bin/sh
+exec svlogd .
+EOF
+        chmod +x "$sv_dir/log/run"
+        
+        ui_print success "Service registered: $name"
+    else
+        ui_print warn "Linux environment does not support auto-registering system services, will use traditional mode."
+    fi
+}
+export -f tavx_service_register
+
+tavx_service_control() {
+    local action="$1"
+    local name="$2"
+    
+    if [ "$OS_TYPE" == "TERMUX" ]; then
+        if [ "$action" == "status" ]; then
+            sv status "$name"
+        else
+            sv "$action" "$name"
+        fi
+    else
+        ui_print error "Current environment does not support sv service control."
+        return 1
+    fi
+}
+export -f tavx_service_control
+
+is_app_running() {
+    local id="$1"
+    
+    if [ "$OS_TYPE" == "TERMUX" ]; then
+        if sv status "$id" 2>/dev/null | grep -q "^run:"; then return 0; fi
+        
+        if [ "$id" == "cloudflare" ]; then
+            pgrep -f "cloudflared" >/dev/null 2>&1 && return 0
+            return 1
+        fi
+        
+        local pid_file="$TAVX_DIR/run/${id}.pid"
+        if [ -f "$pid_file" ] && [ -s "$pid_file" ]; then
+            local pid=$(cat "$pid_file")
+            if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then return 0; fi
+        fi
+        
+        return 1
+    else
+        local pid_file="$TAVX_DIR/run/${id}.pid"
+        if [ "$id" == "cloudflare" ]; then
+             pgrep -f "cloudflared" >/dev/null 2>&1 && return 0
+        fi
+        
+        if [ -f "$pid_file" ] && [ -s "$pid_file" ]; then
+            local pid=$(cat "$pid_file")
+            if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then return 0; fi
+        fi
+        return 1
+    fi
+}
+export -f is_app_running
+
 stop_all_services_routine() {
     ui_print info "Stopping all services..."
     
+    if [ "$OS_TYPE" == "TERMUX" ] && command -v sv &>/dev/null; then
+        local sv_base="$PREFIX/var/service"
+        if [ -d "$sv_base" ]; then
+            for s in "$sv_base"/*; do
+                [ ! -d "$s" ] && continue
+                if [ -f "$s/.tavx_managed" ]; then
+                    local sname=$(basename "$s")
+                    sv down "$sname" 2>/dev/null
+                    ui_print success "Stopped service: $sname"
+                fi
+            done
+        fi
+    fi
+
     local run_dir="$TAVX_DIR/run"
     if [ -d "$run_dir" ]; then
         for pid_file in "$run_dir"/*.pid; do

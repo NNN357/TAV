@@ -42,6 +42,87 @@ FORCE_UPDATE=false
 if [ "$TAVX_INSTALLER_MODE" == "true" ]; then FORCE_UPDATE=true; fi
 if [[ "$1" == "update" || "$1" == "install" || "$1" == "reinstall" ]]; then FORCE_UPDATE=true; fi
 
+if [[ "$1" == "status" || "$1" == "ps" || "$1" == "list" || "$1" == "stop" || "$1" == "kill" || "$1" == "re" || "$1" == "log" ]]; then
+    if [ -f "$HOME/.tav_x/core/env.sh" ]; then
+        source "$HOME/.tav_x/core/env.sh"
+        source "$HOME/.tav_x/core/utils.sh"
+        
+        case "$1" in
+            status|ps|list)
+                echo -e "${BLUE}=== TAV-X Service Status ===${NC}"
+                if [ -d "$TAVX_DIR/modules" ]; then
+                    for mod in "$TAVX_DIR/modules"/*; do
+                        [ ! -d "$mod" ] && continue
+                        id=$(basename "$mod")
+                        if [ "$id" == "cloudflare" ]; then
+                            if [ "$OS_TYPE" == "TERMUX" ]; then
+                                for s in "$PREFIX/var/service"/cf_tunnel_*; do
+                                    [ ! -d "$s" ] && continue
+                                    sv status "$(basename "$s")" 2>/dev/null | grep -q "^run:" && echo -e "${GREEN}[RUNNING]${NC} $(basename "$s")"
+                                done
+                            else
+                                for pid_f in "$TAVX_DIR/run"/cf_*.pid; do
+                                    [ -f "$pid_f" ] && kill -0 $(cat "$pid_f") 2>/dev/null && echo -e "${GREEN}[RUNNING]${NC} $(basename "$pid_f" .pid)"
+                                done
+                            fi
+                            continue
+                        fi
+                        is_app_running "$id" && echo -e "${GREEN}[RUNNING]${NC} $id"
+                    done
+                fi
+                ;;
+            stop|kill)
+                echo -e "${YELLOW}Stopping all TAV-X services...${NC}"
+                stop_all_services_routine
+                echo -e "${GREEN}✔ All stopped${NC}"
+                ;;
+            re)
+                echo -e "${CYAN}Restarting all running TAV-X services...${NC}"
+                if [ "$OS_TYPE" == "TERMUX" ] && command -v sv &>/dev/null; then
+                    for s in "$PREFIX/var/service"/*; do
+                        if [ -f "$s/.tavx_managed" ] && sv status "$(basename "$s")" 2>/dev/null | grep -q "^run:"; then
+                            echo -e "Restarting: $(basename "$s")..."
+                            sv restart "$(basename "$s")" >/dev/null
+                        fi
+                    done
+                    echo -e "${GREEN}✔ Restart commands sent${NC}"
+                else
+                    echo -e "${RED}This environment does not support quick restart, please use main menu.${NC}"
+                fi
+                ;;
+            log)
+                if [ -z "$2" ]; then
+                    echo -e "${BLUE}=== Available Log Services ===${NC}"
+                    if [ "$OS_TYPE" == "TERMUX" ] && [ -d "$PREFIX/var/service" ]; then
+                        for s in "$PREFIX/var/service"/*; do
+                            [ -f "$s/.tavx_managed" ] && echo -e "  - $(basename "$s")"
+                        done
+                    fi
+                    echo -e "\nUsage: ${YELLOW}st log <app_id>${NC}"
+                else
+                    LOG_PATH=""
+                    if [ "$OS_TYPE" == "TERMUX" ]; then
+                        LOG_PATH="$PREFIX/var/service/$2/log/current"
+                    fi
+                    # Fallback to legacy logs dir
+                    [ ! -f "$LOG_PATH" ] && LOG_PATH="$TAVX_DIR/logs/$2.log"
+                    
+                    if [ -f "$LOG_PATH" ]; then
+                        safe_log_monitor "$LOG_PATH"
+                    else
+                        echo -e "${RED}Error: Log file not found '$2'${NC}"
+                        echo -e "Run ${CYAN}st log${NC} to see available IDs"
+                    fi
+                fi
+                ;;
+        esac
+        exit 0
+    else
+        echo "Error: Core files not found."
+        exit 1
+    fi
+fi
+
 if [ -f "$TAVX_DIR/core/main.sh" ] && [ "$FORCE_UPDATE" == "false" ]; then
     exec bash "$TAVX_DIR/core/main.sh" "$@"
 fi

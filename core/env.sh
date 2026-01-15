@@ -36,8 +36,22 @@ mkdir -p "$CONFIG_DIR" "$LOGS_DIR" "$RUN_DIR" "$APPS_DIR" "$TAVX_BIN"
 
 [[ ":$PATH:" != *":$TAVX_BIN:"* ]] && export PATH="$TAVX_BIN:$PATH"
 
-export CURRENT_VERSION="3.0.8"
+export CURRENT_VERSION="3.1.0"
 export NETWORK_CONFIG="$CONFIG_DIR/network.conf"
+
+export CORE_DEPENDENCIES=(
+    "git|git|git"
+    "node|nodejs|nodejs"
+    "python3|python|python3"
+    "yq|yq|yq"
+    "jq|jq|jq"
+    "gum|gum|gum"
+    "tar|tar|tar"
+    "less|less|less"
+    "curl|curl|curl"
+    "pkill|procps|procps"
+    "sv|termux-services|runit"
+)
 
 export RED='\033[0;31m'
 export GREEN='\033[0;32m'

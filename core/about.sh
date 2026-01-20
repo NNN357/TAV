@@ -34,12 +34,12 @@ show_about_page() {
 
     if [ "$HAS_GUM" = true ]; then
         echo ""
-        gum style --foreground 212 --bold "  🚀 Update Preview"
-        gum style --foreground 250 --padding "0 2" "• $UPDATE_SUMMARY"
+        "$GUM_BIN" style --foreground 212 --bold "  🚀 Update Preview"
+        "$GUM_BIN" style --foreground 250 --padding "0 2" "• $UPDATE_SUMMARY"
         echo ""
 
-        local label_style="gum style --foreground 99 --width 10"
-        local value_style="gum style --foreground 255"
+        local label_style="$GUM_BIN style --foreground 99 --width 10"
+        local value_style="$GUM_BIN style --foreground 255"
 
         echo -e "  $($label_style "Author QQ:")  $($value_style "$AUTHOR_QQ")"
         echo -e "  $($label_style "QQ Group:")  $($value_style "$GROUP_QQ")"
@@ -48,7 +48,7 @@ show_about_page() {
         echo ""
         echo ""
 
-        gum style \
+        "$GUM_BIN" style \
             --border rounded \
             --border-foreground 82 \
             --padding "1 4" \
@@ -79,13 +79,13 @@ show_about_page() {
     local ACTION=""
     
     if [ "$HAS_GUM" = true ]; then
-        ACTION=$(gum choose "🔙 Return to Main Menu" "⌨️ Shortcut Commands" "🔥 Join QQ Group" "🐙 GitHub Project Page")
+        ACTION=$("$GUM_BIN" choose "🔙 Return to Main Menu" "⌨️ Shortcut Commands" "🔥 Join QQ Group" "🐙 GitHub Project Page")
     else
         echo "1. Return to Main Menu"
         echo "2. ⌨️  Shortcut Commands"
         echo "3. Join QQ Group"
         echo "4. Open GitHub Project Page"
-        read -p "Please select: " idx
+        read -r -p "Please select: " idx
         case "$idx" in
             "2") ACTION="Shortcut Commands" ;;
             "3") ACTION="Join QQ Group" ;;

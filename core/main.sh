@@ -18,6 +18,21 @@ scan_and_load_modules
 check_for_updates
 send_analytics
 
+if [ -n "$1" ]; then
+    for i in "${!REGISTERED_MODULE_IDS[@]}"; do
+        if [ "${REGISTERED_MODULE_IDS[$i]}" == "$1" ]; then
+            ENTRY_FUNC="${REGISTERED_MODULE_ENTRIES[$i]}"
+            shift
+            if command -v "$ENTRY_FUNC" &>/dev/null; then
+                $ENTRY_FUNC "$@"
+                exit $?
+            fi
+        fi
+    done
+    ui_print error "Module not found: $1"
+    exit 1
+fi
+
 app_drawer_menu() {
     while true; do
         if [ ${#REGISTERED_MODULE_NAMES[@]} -eq 0 ]; then
@@ -54,7 +69,8 @@ app_drawer_menu() {
         
         APP_MENU_OPTS+=("🔙 Return to Main Menu")
 
-        local CHOICE=$(ui_menu "My Apps" "${APP_MENU_OPTS[@]}")
+        local CHOICE
+        CHOICE=$(ui_menu "My Apps" "${APP_MENU_OPTS[@]}")
         if [[ "$CHOICE" == *"Return"* ]]; then return; fi
         
         local found=false
@@ -101,7 +117,13 @@ while true; do
     SHORTCUT_IDS=()
     
     if [ -f "$TAVX_DIR/config/shortcuts.list" ]; then
-        shortcuts=($(cat "$TAVX_DIR/config/shortcuts.list"))
+        if [ "${BASH_VERSINFO:-0}" -ge 4 ]; then
+            mapfile -t shortcuts < "$TAVX_DIR/config/shortcuts.list"
+        else
+            # shellcheck disable=SC2207
+            shortcuts=($(cat "$TAVX_DIR/config/shortcuts.list"))
+        fi
+
         if [ ${#shortcuts[@]} -gt 0 ]; then
             for sid in "${shortcuts[@]}"; do
                 idx=-1

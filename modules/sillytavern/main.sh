@@ -70,7 +70,12 @@ sillytavern_update() {
     prepare_network_strategy
     
     local TEMP_URL=$(get_dynamic_repo_url "SillyTavern/SillyTavern")
-    local UPDATE_CMD="cd \"$ST_DIR\"; git pull --autostash \"$TEMP_URL\""
+    
+    # Configure git to use rebase strategy for divergent branches
+    git config pull.rebase false 2>/dev/null
+    
+    # Fetch and reset to avoid merge conflicts
+    local UPDATE_CMD="cd \"$ST_DIR\"; git fetch \"$TEMP_URL\" && git reset --hard FETCH_HEAD"
     
     if ui_stream_task "Syncing latest code..." "$UPDATE_CMD"; then
         ui_print success "Code sync complete."
